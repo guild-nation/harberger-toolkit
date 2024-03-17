@@ -30,6 +30,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
     //////////////////////////////////////////////////////////////*/
 
     error ZeroAddress();
+    error NotAuthorized();
     error NonTransferable();
     error MaxSupply();
     error InsufficientDeposit();
@@ -59,6 +60,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
     uint256 public previousHolderShare;
     uint256 public benefactorShare;
 
+    address public benefactor;
     uint256 public benefactorBalance;
 
     /// @param _name Name for the collection
@@ -68,6 +70,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
     /// @param _taxPeriod Time over which the tax will be charged
     /// @param _minPeriodCovered Minimum time period that the deposit has to cover
     /// @param _previousHolderShare Share of the purchasing price that goes to the previous holder
+    /// @param _benefactor Address to pay the taxes
     /// @param _benefactorShare Share of the purchasing price that goes to the benefactor
     constructor(
         string memory _name,
@@ -78,6 +81,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
         uint256 _taxNumerator,
         uint256 _minPeriodCovered,
         uint256 _previousHolderShare,
+        address _benefactor,
         uint256 _benefactorShare
     ) ERC721(_name, _symbol) {
         baseURI = _baseURI;
@@ -86,6 +90,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
         taxNumerator = _taxNumerator;
         minPeriodCovered = _minPeriodCovered;
         previousHolderShare = _previousHolderShare;
+        benefactor = _benefactor;
         benefactorShare = _benefactorShare;
     }
 
@@ -100,6 +105,11 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
 
     modifier collect(address patron) {
         collectTax(patron);
+        _;
+    }
+
+    modifier onlyAdminOrBenefactor() {
+        if (msg.sender != benefactor || msg.sender != owner) revert NotAuthorized();
         _;
     }
 
@@ -350,6 +360,14 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
         emit TaxNumeratorUpdate(newTaxNumerator);
     }
 
+    /// @notice Allows either the admin or benefactor to update the recipient address.
+    /// @param _benefactor The new address to use as benefactor
+    function setBenefactor(address _benefactor) external onlyAdminOrBenefactor {
+        if (_benefactor == address(0)) { revert ZeroAddress(); }
+
+        benefactor = _benefactor;
+    }
+
     /// @notice Allows the owner to update the royalty the benefactor gets on each acquisition
     /// @param newBenefactorShare The new fee to give the benefactor
     /// @dev This fee + the previous holder fee shouldn't add up to more than 10000.
@@ -376,13 +394,8 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
     }
 
     /// @notice Withdraw funds from the contract
-    /// @param benefactor Address of the recipient
     /// @return success Whether the transfer was successful
-    function withdrawBenefactor(address payable benefactor) external onlyOwner returns (bool success) {
-        if (benefactor == address(0) || benefactor == address(this)) {
-            revert ZeroAddress();
-        }
-
+    function withdrawBenefactor() external returns (bool success) {
         uint256 balance = benefactorBalance;
         benefactorBalance = 0;
 

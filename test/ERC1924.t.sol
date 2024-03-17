@@ -17,7 +17,7 @@ contract ERC1924Test is Test, AddressBook {
 
     function setUp() public {
         vm.startPrank(OWNER);
-        nft = new ERC1924("MockNft", "MNFT", "https://ipfs.io/", 10_000, 365 days, 10_00, 30 days, 5_00, 1_00);
+        nft = new ERC1924("MockNft", "MNFT", "https://ipfs.io/", 10_000, 365 days, 10_00, 30 days, 5_00, BOB, 1_00);
         price = 1 ether;
         vm.stopPrank();
     }

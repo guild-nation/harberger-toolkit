@@ -9,5 +9,5 @@ interface IERC1924 {
     function deposit(address recipient) external payable;
     function withdraw(uint256 amount) external returns (bool);
     function collectTax(address patron) external;
-    function withdrawBenefactor(address payable benefactor) external returns (bool);
+    function withdrawBenefactor() external returns (bool);
 }
