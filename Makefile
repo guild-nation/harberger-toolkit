@@ -38,4 +38,4 @@ deploy-lib:
 	forge create --rpc-url $(RPC_URL) --private-key $(PRIVATE_KEY) --optimize --verify src/AddressBook.sol:AddressBook
 
 deploy:
-	forge create --rpc-url $(RPC_URL) --private-key $(PRIVATE_KEY) --libraries $(LIBRARIES) --constructor-args $(BASE_URI) $(OWNER) --optimize --verify src/Proto.sol:Proto
+	forge create --rpc-url $(RPC_URL) --private-key $(PRIVATE_KEY) --libraries $(LIBRARIES) --constructor-args $(BASE_URI) $(OWNER) --optimize --verify src/ERC1924.sol:ERC1924
