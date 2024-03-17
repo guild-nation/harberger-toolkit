@@ -82,40 +82,17 @@ contract ERC1924Test is Test, AddressBook {
         vm.stopPrank();
     }
 
-    function test_withdrawBenefactor_AsOwner() public {
+    function test_withdrawBenefactor() public {
         nft.mint{value: price}(price);
 
         skip(1 days);
         nft.collectTax(addr);
 
-        vm.startPrank(OWNER);
-        bool success = nft.withdrawBenefactor(payable(ALICE));
+        bool success = nft.withdrawBenefactor();
         assertEq(success, true);
-        vm.stopPrank();
 
-        uint256 balance = address(ALICE).balance;
+        uint256 balance = address(BOB).balance;
         assertEq(balance, price * 1 days * 10_00 / 365 days / 100_00);
-    }
-
-    function test_withdrawBenefactor_RevertIf_ZeroAddress() public {
-        vm.startPrank(OWNER);
-        vm.expectRevert(ERC1924.ZeroAddress.selector);
-        nft.withdrawBenefactor(payable(0x0));
-        vm.stopPrank();
-    }
-
-    function test_withdrawBenefactor_RevertIf_ContractAddress() public {
-        vm.startPrank(OWNER);
-        vm.expectRevert(ERC1924.ZeroAddress.selector);
-        nft.withdrawBenefactor(payable(nft));
-        vm.stopPrank();
-    }
-
-    function test_withdrawBenefactor_RevertIf_NonOwner() public {
-        vm.startPrank(ALICE);
-        vm.expectRevert("UNAUTHORIZED");
-        nft.withdrawBenefactor(payable(ALICE));
-        vm.stopPrank();
     }
 
     function test_setBenefactorShare_AsOwner() public {
