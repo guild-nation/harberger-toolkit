@@ -109,7 +109,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
     }
 
     modifier onlyAdminOrBenefactor() {
-        if (msg.sender != benefactor || msg.sender != owner) revert NotAuthorized();
+        if (msg.sender != benefactor && msg.sender != owner) revert NotAuthorized();
         _;
     }
 
@@ -385,7 +385,6 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
 
         previousHolderShare = newPreviousHolderShare;
     }
-
 
     /// @notice Set the base URI for the token
     /// @param uri New base URI

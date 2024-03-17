@@ -95,6 +95,34 @@ contract ERC1924Test is Test, AddressBook {
         assertEq(balance, price * 1 days * 10_00 / 365 days / 100_00);
     }
 
+    function test_setBenefactor_AsOwner() public {
+        assertEq(nft.benefactor(), BOB);
+        vm.startPrank(OWNER);
+        nft.setBenefactor(ALICE);
+        vm.stopPrank();
+        assertEq(nft.benefactor(), ALICE);
+    }
+
+    function test_setBenefactor_AsBenefactor() public {
+        assertEq(nft.benefactor(), BOB);
+        vm.startPrank(BOB);
+        nft.setBenefactor(ALICE);
+        vm.stopPrank();
+        assertEq(nft.benefactor(), ALICE);
+    }
+
+    function test_setBenefactor_RevertIf_NotAuthorized() public {
+        vm.expectRevert(ERC1924.NotAuthorized.selector);
+        nft.setBenefactor(ALICE);
+    }
+
+    function test_setBenefactor_RevertIf_ZeroAddress() public {
+        vm.startPrank(BOB);
+        vm.expectRevert(ERC1924.ZeroAddress.selector);
+        nft.setBenefactor(address(0x0));
+        vm.stopPrank();
+    }
+
     function test_setBenefactorShare_AsOwner() public {
         vm.startPrank(OWNER);
         uint256 prevShare = nft.benefactorShare();
