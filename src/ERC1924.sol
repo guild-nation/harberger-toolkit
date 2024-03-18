@@ -339,7 +339,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
         if (tokenId > totalSupply || tokenId == 0 || bytes(baseURI).length == 0) {
             revert NonExistentToken();
         }
-        return string.concat(baseURI, LibString.toString(tokenId));
+        return string.concat(baseURI, LibString.toString(tokenId), ".json");
     }
 
     /*//////////////////////////////////////////////////////////////

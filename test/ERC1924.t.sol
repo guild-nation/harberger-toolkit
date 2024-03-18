@@ -598,7 +598,7 @@ contract ERC1924Test is Test, AddressBook {
     function test_uri_GetTokenURI() public {
         nft.mint{value: price}(price);
         string memory uri = nft.tokenURI(1);
-        assertEq(uri, "https://ipfs.io/1");
+        assertEq(uri, "https://ipfs.io/1.json");
     }
 
     function test_uri_RevertIf_NonExistentTokenURI() public {
@@ -613,7 +613,7 @@ contract ERC1924Test is Test, AddressBook {
         nft.setBaseURI("https://ipfs.io/#");
 
         string memory uri = nft.tokenURI(1);
-        assertEq(uri, "https://ipfs.io/#1");
+        assertEq(uri, "https://ipfs.io/#1.json");
     }
 
     function test_uri_RevertIf_BaseURIIsEmpty() public {
@@ -629,7 +629,7 @@ contract ERC1924Test is Test, AddressBook {
     function test_uri_FixBaseURI() public {
         nft.mint{value: price}(price);
         string memory uri = nft.tokenURI(1);
-        assertEq(uri, "https://ipfs.io/1");
+        assertEq(uri, "https://ipfs.io/1.json");
 
         vm.prank(OWNER);
         nft.setBaseURI("");
@@ -641,7 +641,7 @@ contract ERC1924Test is Test, AddressBook {
         nft.setBaseURI("https://ipfs.io/");
 
         uri = nft.tokenURI(1);
-        assertEq(uri, "https://ipfs.io/1");
+        assertEq(uri, "https://ipfs.io/1.json");
     }
 
     function test_uri_RevertIf_SetBaseURIAsNonOwner() public {
