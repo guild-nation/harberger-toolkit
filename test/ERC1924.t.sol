@@ -523,6 +523,18 @@ contract ERC1924Test is Test, AddressBook {
         nft.acquire(20, 1 ether);
     }
 
+
+    function test_acquire_AcquisitionPrice() public {
+        nft.mint{value: price}(price);
+
+        uint256 expectedPrice = (price * nft.minPeriodCovered() / nft.taxPeriod())
+            + (price * nft.benefactorShare() / nft.SHARE_DENOMINATOR())
+            + (price * nft.previousHolderShare() / nft.SHARE_DENOMINATOR());
+
+        uint256 actualPrice = nft.acquisitionPrice(1);
+        assertEq(expectedPrice, actualPrice);
+    }
+
     /// Update Valuation
 
     function test_updateValuation_LowerValuation() public {

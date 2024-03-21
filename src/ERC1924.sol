@@ -252,7 +252,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
     /// @notice Lets someone deposit funds for a specific recipient
     /// @param recipient The target to receive funds
     function deposit(address recipient) external payable nonReentrant {
-        if (recipient == address(0)) { revert ZeroAddress(); }
+        if (recipient == address(0)) revert ZeroAddress();
 
         deposits[recipient] += msg.value;
         emit Deposit(recipient, msg.value);
@@ -309,6 +309,17 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
         }
     }
 
+
+    /// @notice Returns the acquisition price for a token
+    /// @param tokenId The token to check
+    /// @return The price to acquire the token
+    function acquisitionPrice(uint256 tokenId) public view returns (uint256) {
+        uint256 valuation = valuations[tokenId];
+
+        return valuation * minPeriodCovered / taxPeriod + valuation * benefactorShare / SHARE_DENOMINATOR
+            + valuation * previousHolderShare / SHARE_DENOMINATOR;
+    }
+
     /// @notice Returns the timestamp when a specific token will default
     /// @param tokenId The token to check
     function foreclosureTime(uint256 tokenId) external view returns (uint256) {
@@ -322,7 +333,7 @@ contract ERC1924 is ERC721, IERC1924, Owned(msg.sender), ReentrancyGuard {
     /// @param patron The address of the patron to check
     function foreclosureTimePatron(address patron) public view returns (uint256) {
         uint256 taxPerSecond = totalCosts[patron] / taxPeriod / TAX_DENOMINATOR;
-        if(taxPerSecond == 0) return type(uint256).max;
+        if (taxPerSecond == 0) return type(uint256).max;
 
         return block.timestamp + getRemainingDeposit(patron) / taxPerSecond;
     }
